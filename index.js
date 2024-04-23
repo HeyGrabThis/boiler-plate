@@ -4,6 +4,7 @@ const port = 5000;
 
 const bodyParser = require('body-parser');
 const User = require('./models/User');
+const Config = require('./config/key');
 
 //bodyParser 옵션주기 =>이런 데이터들을 처리해서 파싱할 수 있도록
 //application/x-www-form-urlencoded
@@ -15,10 +16,7 @@ app.use(bodyParser.json());
 const mongoose = require('mongoose');
 //몽고db연결
 mongoose
-  .connect(
-    'mongodb+srv://qkqajrrhtj:dhzpdl6632@cluster0.4vycw4p.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
-    {}
-  )
+  .connect(Config.mongoURI, {})
   .then(() => {
     console.log('mongoDB Connected!');
   })
@@ -27,7 +25,7 @@ mongoose
   });
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Hello World!~~');
 });
 
 // 회원가입할 정보들 서버로 보내기 => async await 형식으로
