@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const User = require('./models/User');
 const Config = require('./config/key');
 const cookieParser = require('cookie-parser');
+const auth = require('./middleware/auth');
 
 //bodyParser 옵션주기 =>이런 데이터들을 처리해서 파싱할 수 있도록
 //application/x-www-form-urlencoded
@@ -32,7 +33,7 @@ app.get('/', (req, res) => {
 });
 
 // 회원가입할 정보들 서버로 보내기 => async await 형식으로
-app.post('/register', async (req, res) => {
+app.post('/api/users/register', async (req, res) => {
   //body-parser를 이용해서 body에 데이터를 실어 보낼수있다.
   const user = new User(req.body);
   //save는 mongo매서드
@@ -86,6 +87,25 @@ app.post('/api/users/login', async (req, res) => {
   } catch (err) {
     return res.status(400).send(err);
   }
+});
+
+//페이지 이동할 때 권한이 있는지 확인
+//=> 쿠키에 있는 토큰을 디코딩 => user아이디가 나옴(아이디랑 문자 더해서 만들었음) => 그 user아이디를 db에서 찾아보고 db의 토큰이 쿠키에 있는 토큰이랑 같은지 확인
+// 중간의 auth는 미들웨어(인증처리를 하는 곳)
+app.get('/api/users/auth', auth, (req, res) => {
+  //여기까지 온 것은 auth로직을 통과해서 인증을 받고 왔다는 이야기
+  //프론트에 status200이랑 json데이터 전달
+  res.status(200).json({
+    _id: req.user._id,
+    //role이 0이면 일반, 0이아닌 다른수면 관리자(일단 이렇게 가정)
+    isAdmin: req.user.role === 0 ? false : true,
+    isAuth: true,
+    email: req.user.email,
+    name: req.user.name,
+    lastname: req.user.lastname,
+    role: req.user.role,
+    image: req.user.image,
+  });
 });
 
 app.listen(port, () => {

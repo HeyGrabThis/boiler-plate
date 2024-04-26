@@ -92,6 +92,15 @@ userSchema.methods.generateToken = async (userInfo) => {
   }
 };
 
+userSchema.statics.findByToken = async (token) => {
+  //토큰을 decode한다.
+  const decoded = jwt.verify(token, 'secretToken');
+  //유저 아이디를 통해 db에서 유저를 찾는다.
+  //클라이언트의 토큰과 db의 토큰이 일치하는지 확인
+  const user = await User.findOne({ _id: decoded, token: token });
+  return user;
+};
+
 //모델로 감싸기 => 이름이 User이고 틀이 userSchema인 모델 생성
 const User = mongoose.model('User', userSchema);
 
