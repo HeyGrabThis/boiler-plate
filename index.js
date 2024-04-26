@@ -108,6 +108,19 @@ app.get('/api/users/auth', auth, (req, res) => {
   });
 });
 
+//로그아웃기능 => 데이터베이스에서 그 유저의 토큰을 지워준다. => 자동적으로 클라이언트의 토큰과 맞지않으니 권한 상실
+// 권한이 있는 상태에서 실행하므로 auth 미들웨어 등록
+app.get('/api/users/logout', auth, (req, res) => {
+  //_id를 통해서 찾고 token을 ''지우고 에러있다면 false, 성공했다면 200과 true
+  User.findOneAndUpdate({ _id: req.user._id }, { token: '' })
+    .then(() => {
+      return res.status(200).send({ success: true });
+    })
+    .catch((err) => {
+      return res.json({ success: false, err });
+    });
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
