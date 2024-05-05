@@ -1,0 +1,9 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.register {
+  width: 30vw;
+  margin-top: 10vh;
+}
